@@ -1,0 +1,154 @@
+<#include "/include/macro.include"/>
+<#assign className = table.className>   
+<#assign classNameFirstLower = table.classNameFirstLower>   
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<#macro mapperEl value>${r"#{"}${value}</#macro>
+<#macro namespace>${basepackage}.entity</#macro>
+
+<mapper namespace="${basepackage}.mapper.${className}Mapper">
+
+	<!-- 结果Map -->
+	<resultMap id="BaseResultMap" type="${basepackage}.entity.${className}">
+		<#list table.columns as column>
+		<result property="${column.columnNameLower}" jdbcType="${column.jdbcType}" column="${column.sqlName}"/>
+		</#list>
+	</resultMap>
+	
+	<!-- 查询列 -->
+	<sql id="BaseColumnList">
+		<#list table.columns as _column>${_column.sqlName}<#if _column_has_next>,</#if></#list>
+	</sql>
+				
+	<!--创建记录 -->
+	<insert id="create" parameterType="${basepackage}.entity.${className}">
+		INSERT INTO ${table.sqlName}
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+		<#list table.columns as column>
+		    <#if column.jdbcType != "VARCHAR" > 
+			 <if test="${column.columnNameLower}!=null">${column.sqlName}<#if column_has_next>,</#if></if>
+			 <#else>
+			 <if test="${column.columnNameLower}!=null and ${column.columnNameLower}!=''">${column.sqlName}<#if column_has_next>,</#if></if>
+			</#if>
+		</#list>
+		</trim>
+		<trim prefix="VALUES (" suffix=")" suffixOverrides="," >
+		<#list table.columns as column>
+		    <#if column.jdbcType != "VARCHAR" > 
+			<if test="${column.columnNameLower}!=null"><@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}<#if column_has_next>,</#if></if>
+			<#else>
+			<if test="${column.columnNameLower}!=null and ${column.columnNameLower}!=''"><@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}<#if column_has_next>,</#if></if>
+			</#if>
+		</#list>		
+		</trim>
+	</insert>
+	
+	<!-- 更新记录 -->
+	<#if table.hasPk>
+	<update id="updateByPk" parameterType="${basepackage}.entity.${className}">
+		UPDATE ${table.sqlName} 
+		<set>
+            <trim suffixOverrides=",">
+			<#list table.notPkColumns as column>
+    			<#if column.jdbcType != "VARCHAR" > 
+    			<if test="${column.columnNameLower}!=null">${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}<#if column_has_next>,</#if></if>
+    			<#else>
+    			<if test="${column.columnNameLower}!=null and ${column.columnNameLower}!=''">${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}<#if column_has_next>,</#if></if>
+    			</#if>
+			</#list>
+            </trim>
+		</set>
+		<where> 
+			<#list table.pkColumns as column>
+			 ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}<#if column_has_next> AND </#if> 
+			</#list>
+		</where>				
+	</update>
+	
+	<!-- 根据主键查询记录 -->
+	<select id="queryByPk" parameterType="<#if table.pkColumns?size=1>${table.pkColumn.javaType}<#else>${table.className}</#if>" resultMap="BaseResultMap">
+		SELECT <include refid="BaseColumnList" />
+		FROM ${table.sqlName}
+		<where>
+		<#list table.pkColumns as column>
+            ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}<#if column_has_next> AND </#if> 
+        </#list>
+        </where>	
+	</select>
+	
+	<!-- 根据主键删除记录 -->
+	<delete id="deleteByPk" parameterType="<#if table.pkColumns?size=1>${table.pkColumn.javaType}<#else>${table.className}</#if>">
+		DELETE FROM ${table.sqlName}
+		<where> 
+		<#list table.pkColumns as column>
+            ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}<#if column_has_next> AND </#if> 
+        </#list>
+        </where>
+	</delete>	
+	</#if>
+	
+	<!-- 按对象查询 -->
+	<select id="queryBy${className}" parameterType="${basepackage}.entity.${className}" resultMap="BaseResultMap">
+		SELECT <include refid="BaseColumnList" />
+		FROM ${table.sqlName} 
+		<where>
+		1=1
+		<#list table.columns as column>		
+            <#if column.jdbcType != "VARCHAR" >
+            <if test="${column.columnNameLower}!=null">AND ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}</if>
+            <#else> 
+			<if test="${column.columnNameLower}!=null and ${column.columnNameLower}!=''">AND ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}</if>
+			</#if>
+		</#list>
+		</where>
+	</select>
+	
+	<sql id="pageHead">
+	   SELECT * FROM (
+	       SELECT ROWNUM AS RN, TM.* FROM (
+	   
+	</sql>
+	<sql id="pageTail">
+	   ) TM ) TMP
+	   <where>
+	       TMP.RN &gt; ${r'(${pageNum}-1)'}*${r'${pageSize}'}
+	       AND TMP.RN &lt;= ${r'${pageNum}'}*${r'${pageSize}'}
+	   </where>
+	</sql>
+	<sql id="pageBody">
+	   SELECT <include refid="BaseColumnList"/>
+           FROM ${table.sqlName}
+           <where>
+                <#list table.columns as column>
+                <#if column.jdbcType != "VARCHAR" >
+                <if test="${column.columnNameLower}!=null">AND ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}</if>
+                <#else>
+                <if test="${column.columnNameLower}!=null and ${column.columnNameLower}!=''">AND ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}</if>
+                </#if>
+                </#list>
+           </where>
+	</sql>
+	
+	<!-- 根据条件分页 -->
+	<select id="queryByPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+	   <include refid="pageHead"/>
+	       <include refid="pageBody"/>
+	   <include refid="pageTail"/>
+	</select>
+	
+	<!-- 根据条件查询总数 -->
+    <select id="countByCondtion" parameterType="java.util.Map" resultType="long">
+       SELECT COUNT(*) FROM ${table.sqlName}
+            <where>
+                1=1
+                <#list table.columns as column>
+                <#if column.jdbcType != "VARCHAR" >
+	            <if test="${column.columnNameLower}!=null">AND ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}</if>
+	            <#else>
+	            <if test="${column.columnNameLower}!=null and ${column.columnNameLower}!=''">AND ${column.sqlName} = <@mapperEl column.columnNameLower/>,jdbcType=${column.jdbcType}}</if>
+	            </#if> 
+	            </#list>
+            </where>
+    </select>
+</mapper>
+

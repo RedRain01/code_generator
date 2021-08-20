@@ -1,0 +1,39 @@
+<#-- 本文件包含一些公共的函数,本文件会被其它模板自动include -->
+
+<#-- 生成java构造函数 -->
+<#macro generateConstructor constructor>
+    /** constructor */
+	public ${constructor}() {
+		super();
+	}
+
+	<#-- 
+	/**
+	 * constructor.<p>
+	 <#list table.compositeIdColumns as column>
+	 * @param ${column.columnNameLower}
+	 </#list>
+	 */
+	public ${constructor}(<#list table.compositeIdColumns as column>${column.possibleShortJavaType} ${column.columnNameLower}<#if column_has_next>,</#if></#list>){
+		this();
+	<#list table.compositeIdColumns as column>
+		<#if column.pk>
+		this.${column.columnNameLower} = ${column.columnNameLower};
+		</#if>
+	</#list>	
+	}
+	-->
+	/**
+	 * constructor.<p>
+	 <#list table.notPkColumns as column>
+	 * @param ${column.columnNameLower}			${column.remarks}
+	 </#list>
+	 */
+	public ${constructor}(<#list table.notPkColumns as column>${column.possibleShortJavaType} ${column.columnNameLower}<#if column_has_next>,</#if></#list>){
+		this();
+	<#list table.notPkColumns as column>
+		this.${column.columnNameLower} = ${column.columnNameLower};
+	</#list>	
+	}
+	
+</#macro>

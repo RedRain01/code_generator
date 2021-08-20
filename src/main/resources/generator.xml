@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<!-- 基础包路径 -->
+	<entry key="basepackage">com.yspay.corp.protocol</entry>
+	
+	<!-- 输出路径 -->
+	<entry key="outRoot">${user.dir}/generator-output</entry>
+	
+	<!-- 如果输出路径已经存在,是否覆盖 -->
+	<entry key="gg.isOverride">true</entry>
+	
+	<!-- 需要移除的表名前缀,使用逗号进行分隔多个前缀,示例值: t_,v_ -->
+	<entry key="tableRemovePrefixes">T_</entry>
+	
+	<!-- 只处理表名前缀,使用逗号进行分隔多个前缀 -->
+	<entry key="filterTablePrefixes"></entry>
+		
+	<!-- oracle需要指定jdbc.schema,并且可能要大写，其它数据库忽略此项配置  -->
+	 <entry key="jdbc.schema">444444444444</entry>
+	<!-- mysql填库名，其它数据库忽略此项配置  -->
+	 <entry key="jdbc.catalog">whyt</entry>
+	
+	<!-- 数据库类型至java类型映射  -->
+	<entry key="java_typemapping.java.sql.Timestamp">java.util.Date</entry>
+	<entry key="java_typemapping.java.sql.Date">java.util.Date</entry>
+	<entry key="java_typemapping.java.sql.Time">java.util.Date</entry>	
+	<entry key="java_typemapping.java.lang.Byte">java.lang.Integer</entry>
+	<entry key="java_typemapping.java.lang.Short">java.lang.Integer</entry>
+    <entry key="java_typemapping.java.lang.Integer">java.lang.Integer</entry>
+	<!-- <entry key="java_typemapping.java.math.BigDecimal">java.math.BigDecimal</entry> -->
+	<!-- <entry key="java_typemapping.java.math.BigDecimal">java.lang.Long</entry> -->
+	<entry key="java_typemapping.java.sql.Clob">java.lang.String</entry>
+	
+	<!-- Mysql -->
+	<!-- <entry key="jdbc.url">jdbc:mysql://10.211.61.64:3306/rap_db?useUnicode=true&amp;characterEncoding=UTF-8</entry>
+	<entry key="jdbc.driver">com.mysql.jdbc.Driver</entry>
+	<entry key="jdbc.username">root</entry>
+	<entry key="jdbc.password">111111</entry> -->
+	
+	                                            
+	<entry key="jdbc.url">jdbc:mysql://127.0.0.1:3306/whyt?useUnicode=true&amp;characterEncoding=UTF-8&amp;characterEncoding=utf-8&amp;allowMultiQueries=true&amp;useSSL=false&amp;serverTimezone=UTC&amp;nullNamePatternMatchesAll=true</entry>
+	<entry key="jdbc.driver">com.mysql.cj.jdbc.Driver</entry>
+	<entry key="jdbc.username">root</entry>
+	<entry key="jdbc.password">root</entry> 
+	
+	
+	<!-- Oracle -->
+	<!-- <entry key="jdbc.url">jdbc:oracle:thin:@10.213.40.22:1521:yyk01</entry> -->
+	<!-- 
+ 	<entry key="jdbc.url">jdbc:oracle:thin:@10.213.40.93:1521:XE</entry> 
+	
+	<entry key="jdbc.driver">oracle.jdbc.driver.OracleDriver</entry>
+ 	<entry key="jdbc.username">ANTIFRAUD</entry>
+	<entry key="jdbc.password">4093anTI!!##fra</entry>  -->
+<!-- 	<entry key="jdbc.username">risk</entry>
+	<entry key="jdbc.password">Risk!#13</entry> -->
+
+</properties>
